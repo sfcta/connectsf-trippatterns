@@ -11051,7 +11051,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 Vue.component('v-select', _vueSelect2.default);
 
-var api_server = 'http://api.sfcta.org/api/';
+var api_server = 'https://api.sfcta.org/api/';
 var GEO_VIEW = 'taz_boundaries';
 var TABLES_VIEW = 'walkskim_tables';
 var MISSING_COLOR = '#ccc';

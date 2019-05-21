@@ -10788,7 +10788,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 //import vueSlider from 'vue-slider-component';
 
-var api_server = 'http://api.sfcta.org/';
+var api_server = 'https://api.sfcta.org/';
 
 // add the SF Map using Leafleft and MapBox
 var mymap = L.map('sfmap').setView([37.79, -122.44], 14);

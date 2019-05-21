@@ -13160,9 +13160,15 @@ var initialPrep = function () {
 
           case 13:
 
-            console.log('5 !!!');
+            console.log('5... ');
+            _context.next = 16;
+            return checkCookie();
 
-          case 14:
+          case 16:
+
+            console.log('6 !!!');
+
+          case 17:
           case 'end':
             return _context.stop();
         }
@@ -15283,7 +15289,7 @@ var updateMap = function () {
   };
 }();
 
-var fetchComments = function () {
+var postComments = function () {
   var _ref11 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee11(comment) {
     var comment_url;
     return _regenerator2.default.wrap(function _callee11$(_context11) {
@@ -15321,7 +15327,7 @@ var fetchComments = function () {
     }, _callee11, this, [[1, 6]]);
   }));
 
-  return function fetchComments(_x6) {
+  return function postComments(_x6) {
     return _ref11.apply(this, arguments);
   };
 }();
@@ -15346,7 +15352,7 @@ mymap.setView([37.76889, -122.440997], 13);
 mymap.removeLayer(baseLayer);
 var url = 'https://api.mapbox.com/styles/v1/mapbox/light-v10/tiles/256/{z}/{x}/{y}?access_token={accessToken}';
 var token = 'pk.eyJ1Ijoic2ZjdGEiLCJhIjoiY2ozdXBhNm1mMDFkaTJ3dGRmZHFqanRuOCJ9.KDmACTJBGNA6l0CyPi1Luw';
-var attribution = '<a href="http://openstreetmap.org">OpenStreetMap</a> | ' + '<a href="http://mapbox.com">Mapbox</a>';
+var attribution = '<a href="https://openstreetmap.org">OpenStreetMap</a> | ' + '<a href="https://mapbox.com">Mapbox</a>';
 baseLayer = L.tileLayer(url, {
   attribution: attribution,
   minZoom: 10,
@@ -15387,8 +15393,8 @@ var API_SERVER = 'https://api.sfcta.org/api/';
 var GEO_VIEW = 'taz_boundaries';
 var DATA_VIEW = 'connectsf_traveltime';
 var COMMENT_SERVER = 'https://api.sfcta.org/commapi/';
-var COMMENT_VIEW = 'test_comment';
-var VIZNAME = 'csf_acc';
+var COMMENT_VIEW = 'csf_tt_comment';
+var VIZNAME = 'csf_tt';
 var FREQ_DIST_VIEW = 'connectsf_ttdist_all';
 var FREQ_BY_GEO_VIEW = 'PLACEHOLDER';
 var FREQ_DIST_BIN_VAR = 'bin';
@@ -15872,7 +15878,8 @@ function checkCookie() {
 var comment = {
   vizname: VIZNAME,
   select_year: '',
-  select_metric: '',
+  select_purpose: '',
+  select_income: '',
   add_layer: '',
   comment_user: '',
   comment_time: new Date(),
@@ -15887,36 +15894,51 @@ function showPosition(position) {
 }
 
 function handleSubmit() {
-  var timestamp = new Date();
+  this.$refs.recaptcha.execute();
   app.submit_loading = true;
+}
 
+function onCaptchaVerified(recaptchaToken) {
+  var self = this;
+  self.$refs.recaptcha.reset();
+
+  var timestamp = new Date();
   setTimeout(function () {
     if (app.comment == null | app.comment == '') {
       app.submit_loading = false;
     } else {
       comment.select_year = app.selected_year;
-      comment.select_metric = app.selected_metric;
-      comment.add_layer = app.ADDLAYERS;
+      comment.select_purpose = app.selected_importance;
+      comment.select_income = app.selected_income;
+      comment.add_layer = app.addLayers;
       comment.comment_user = getCookie("username");
       comment.comment_time = timestamp;
       comment.comment_content = app.comment;
-      fetchComments(comment);
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showPosition);
       } else {
         console.log("Geolocation is not supported by this browser.");
       }
-      console.log((0, _stringify2.default)(comment));
-      app.comment = "Thanks for submitting your comment!";
+      //console.log(JSON.stringify(comment));
+      postComments(comment);
+      app.comment_instruction = 'Thank you for your feedback!';
+      app.comment = '';
       app.submit_loading = false;
-      app.submit_disabled = true;
+      // app.submit_disabled = true;
     }
   }, 1000);
+}
+
+function onCaptchaExpired() {
+  this.$refs.recaptcha.reset();
 }
 
 var app = new Vue({
   el: '#panel',
   delimiters: ['${', '}'],
+  components: {
+    'vue-recaptcha': VueRecaptcha
+  },
   data: {
     isPanelHidden: false,
     extraLayers: ADDLAYERS,
@@ -15962,6 +15984,7 @@ var app = new Vue({
       '#fafa6e,#2A4858': 'lch'
     },
     comment: '',
+    comment_instruction: 'Based on this data, what do you think are the city’s transportation needs? (800 characters)',
     addLayers: [],
     selected_breaks: 5,
     submit_loading: false,
@@ -15986,7 +16009,9 @@ var app = new Vue({
     incomeChanged: incomeChanged,
     updateMap: updateMap,
     clickToggleHelp: clickToggleHelp,
-    clickedShowHide: clickedShowHide
+    clickedShowHide: clickedShowHide,
+    onCaptchaVerified: onCaptchaVerified,
+    onCaptchaExpired: onCaptchaExpired
   }
 });
 

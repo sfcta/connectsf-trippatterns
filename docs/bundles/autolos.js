@@ -10965,7 +10965,7 @@ var _vueSliderComponent2 = _interopRequireDefault(_vueSliderComponent);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var api_server = 'http://api.sfcta.org/api/';
+var api_server = 'https://api.sfcta.org/api/';
 var data_view = 'cmp_auto';
 
 var segmentLayer = void 0;
